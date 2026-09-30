@@ -103,9 +103,22 @@ En **Atajos → Automatización → +**, eligiendo **Ejecutar inmediatamente**:
 
 Usa una de las dos, no ambas, para no duplicar.
 
-## 7. Actualizar la app
+## 7. Fuente de SideStore / AltStore para actualizar con un toque
 
-Cambias el código, lo subes a GitHub, descargas el nuevo `Sueno.ipa` y lo instalas encima con SideStore. Tus datos se conservan porque es la misma app. Por si acaso, antes usa **Ajustes → Exportar respaldo**.
+Para actualizar la app sin tener que descargar e instalar a mano el archivo `.ipa` en cada cambio:
+
+1. La URL de tu fuente se publica automáticamente en GitHub Pages tras cada compilación exitosa:
+   ```
+   https://<TU_USUARIO>.github.io/sueno/apps.json
+   ```
+   *(Reemplaza `<TU_USUARIO>` por tu usuario de GitHub).*
+
+2. Cómo agregarla en SideStore:
+   - En el iPhone, abre **SideStore → Sources** (o Fuentes).
+   - Toca el botón **+** arriba a la derecha.
+   - Pega la URL de tu fuente (`https://<TU_USUARIO>.github.io/sueno/apps.json`) y toca **Add**.
+
+3. ¡Listo! Ahora Sueño aparecerá dentro de SideStore y podrás actualizarla con un solo toque en tu iPhone cuando subas cambios a GitHub. Tus datos y registros se conservan intactos.
 
 ## Si algo falla
 
