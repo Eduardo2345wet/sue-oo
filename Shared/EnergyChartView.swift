@@ -8,15 +8,21 @@ struct EnergyChartView: View {
     let now: Date
     var compact: Bool = false
 
-    /// 0 % = lo más bajo de tu día, 100 % = lo más alto.
-    private func percent(_ date: Date) -> Double {
-        100 * plan.level(at: date)
+    /// Relativo a lo que se dibuja: el punto más bajo queda en 10 % y el más alto en 90 %.
+    /// La escala sale de toda la curva (también la hora después de la melatonina),
+    /// así el final no se recorta ni se queda pegado en 0 %.
+    private func percent(_ value: Double, lo: Double, hi: Double) -> Double {
+        guard hi - lo > 0.01 else { return 50 }
+        return 10 + 80 * (value - lo) / (hi - lo)
     }
 
     var body: some View {
         let yLow = -4.0
         let yHigh = 104.0
         let showNow = now >= plan.start && now <= plan.end
+        let values = plan.points.map { $0.value }
+        let lo = values.min() ?? plan.lo
+        let hi = values.max() ?? plan.hi
 
         Chart {
             ForEach(plan.windows.filter { $0.start < plan.end }) { w in
@@ -33,7 +39,7 @@ struct EnergyChartView: View {
                 AreaMark(
                     x: .value("Hora", point.date),
                     yStart: .value("Base", 0),
-                    yEnd: .value("Energía", percent(point.date))
+                    yEnd: .value("Energía", percent(point.value, lo: lo, hi: hi))
                 )
                 .interpolationMethod(.catmullRom)
                 .foregroundStyle(
@@ -52,7 +58,7 @@ struct EnergyChartView: View {
             ForEach(plan.points) { point in
                 LineMark(
                     x: .value("Hora", point.date),
-                    y: .value("Energía", percent(point.date))
+                    y: .value("Energía", percent(point.value, lo: lo, hi: hi))
                 )
                 .interpolationMethod(.catmullRom)
                 .lineStyle(StrokeStyle(lineWidth: compact ? 2 : 3, lineCap: .round))
@@ -71,13 +77,13 @@ struct EnergyChartView: View {
                     .foregroundStyle(Theme.tinta.opacity(0.8))
                 PointMark(
                     x: .value("Ahora", now),
-                    y: .value("Energía", percent(now))
+                    y: .value("Energía", percent(plan.value(at: now), lo: lo, hi: hi))
                 )
                 .symbolSize(compact ? 60 : 320)
                 .foregroundStyle(Theme.tinta.opacity(0.22))
                 PointMark(
                     x: .value("Ahora", now),
-                    y: .value("Energía", percent(now))
+                    y: .value("Energía", percent(plan.value(at: now), lo: lo, hi: hi))
                 )
                 .symbolSize(compact ? 30 : 120)
                 .foregroundStyle(Theme.puntoAhora)
