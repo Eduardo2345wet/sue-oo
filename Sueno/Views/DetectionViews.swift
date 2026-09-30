@@ -46,9 +46,7 @@ struct DetectionCard: View {
             }
             .font(.subheadline.weight(.semibold))
         }
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Theme.nocheHonda, in: RoundedRectangle(cornerRadius: 16))
+        .card()
         .sheet(item: $editing) { p in
             ProposalEditorView(proposal: p, start: p.start, end: p.end)
                 .environmentObject(model)
@@ -193,7 +191,7 @@ struct DetectionDiagnosticsView: View {
             }
         }
         .scrollContentBackground(.hidden)
-        .background(Theme.noche.ignoresSafeArea())
+        .background(Theme.nocheHonda.ignoresSafeArea())
         .navigationTitle("Detección de sueño")
         .navigationBarTitleDisplayMode(.inline)
         .confirmationDialog("¿Reiniciar el ajuste aprendido?", isPresented: $confirmReset, titleVisibility: .visible) {

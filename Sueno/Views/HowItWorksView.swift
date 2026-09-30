@@ -50,7 +50,7 @@ struct HowItWorksView: View {
             }
             .padding(20)
         }
-        .background(Theme.noche.ignoresSafeArea())
+        .background(Theme.nocheHonda.ignoresSafeArea())
         .navigationTitle("Cómo se calcula")
         .navigationBarTitleDisplayMode(.inline)
     }

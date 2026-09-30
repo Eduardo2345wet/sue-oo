@@ -21,7 +21,7 @@ struct EnergyChartView: View {
                     yStart: .value("Base", yLow),
                     yEnd: .value("Tope", yHigh)
                 )
-                .foregroundStyle(w.kind.color.opacity(compact ? 0.22 : 0.16))
+                .foregroundStyle(w.kind.color.opacity(compact ? w.kind.bandOpacity + 0.06 : w.kind.bandOpacity))
             }
 
             ForEach(plan.points) { point in
@@ -33,7 +33,7 @@ struct EnergyChartView: View {
                 .interpolationMethod(.catmullRom)
                 .foregroundStyle(
                     LinearGradient(
-                        colors: [Theme.ambar.opacity(0.32), Theme.ambar.opacity(0.0)],
+                        colors: [Theme.ambar.opacity(0.38), Theme.ambar.opacity(0.0)],
                         startPoint: .top,
                         endPoint: .bottom
                     )
@@ -52,14 +52,20 @@ struct EnergyChartView: View {
 
             if showNow {
                 RuleMark(x: .value("Ahora", now))
-                    .lineStyle(StrokeStyle(lineWidth: 1, dash: [3, 3]))
-                    .foregroundStyle(Theme.tinta.opacity(0.6))
+                    .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [3, 4]))
+                    .foregroundStyle(Theme.tinta.opacity(0.8))
                 PointMark(
                     x: .value("Ahora", now),
                     y: .value("Energía", plan.value(at: now))
                 )
-                .symbolSize(compact ? 36 : 110)
-                .foregroundStyle(Theme.tinta)
+                .symbolSize(compact ? 60 : 320)
+                .foregroundStyle(Theme.tinta.opacity(0.22))
+                PointMark(
+                    x: .value("Ahora", now),
+                    y: .value("Energía", plan.value(at: now))
+                )
+                .symbolSize(compact ? 30 : 120)
+                .foregroundStyle(Color.white)
             }
         }
         .chartXScale(domain: plan.start...plan.end)
@@ -68,9 +74,8 @@ struct EnergyChartView: View {
         .chartYAxis(.hidden)
         .chartXAxis {
             AxisMarks(values: .stride(by: .hour, count: compact ? 4 : 3)) { _ in
-                AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5))
-                    .foregroundStyle(Theme.tintaSuave.opacity(0.25))
                 AxisValueLabel(format: .dateTime.hour())
+                    .font(.system(size: 11))
                     .foregroundStyle(Theme.tintaSuave)
             }
         }

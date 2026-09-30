@@ -26,6 +26,11 @@ enum Fmt {
         String(format: "%.1f h", max(0, hours))
     }
 
+    /// Cierra una oración con punto sin duplicarlo ("9:30 p.m." ya trae el suyo).
+    static func sentence(_ text: String) -> String {
+        text.hasSuffix(".") ? text : text + "."
+    }
+
     /// "+12 min", "−8 min" o "0 min"
     static func signedMinutes(_ minutes: Double) -> String {
         let m = Int(minutes.rounded())
