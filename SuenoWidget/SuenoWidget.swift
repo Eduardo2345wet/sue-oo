@@ -142,7 +142,7 @@ struct EnergiaWidget: Widget {
         StaticConfiguration(kind: kind, provider: SuenoProvider()) { entry in
             SuenoWidgetView(entry: entry)
                 .containerBackground(for: .widget) {
-                    Theme.noche
+                    Theme.tarjeta
                 }
         }
         .configurationDisplayName("Sueño y energía")

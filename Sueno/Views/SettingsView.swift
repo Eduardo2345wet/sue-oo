@@ -88,7 +88,7 @@ struct SettingsView: View {
                 }
             }
             .scrollContentBackground(.hidden)
-            .background(Theme.nocheHonda.ignoresSafeArea())
+            .background(Theme.fondo.ignoresSafeArea())
             .navigationTitle("Ajustes")
             .fileExporter(isPresented: $exporting,
                           document: BackupDocument(data: model.exportData()),
@@ -236,7 +236,7 @@ struct ImportView: View {
             }
         }
         .scrollContentBackground(.hidden)
-        .background(Theme.nocheHonda.ignoresSafeArea())
+        .background(Theme.fondo.ignoresSafeArea())
         .navigationTitle("Importar sueño")
     }
 }

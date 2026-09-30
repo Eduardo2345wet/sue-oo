@@ -50,7 +50,7 @@ struct HowItWorksView: View {
             }
             .padding(20)
         }
-        .background(Theme.nocheHonda.ignoresSafeArea())
+        .background(Theme.fondo.ignoresSafeArea())
         .navigationTitle("Cómo se calcula")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -75,7 +75,7 @@ struct Explainer: View {
                 .foregroundStyle(Theme.ambar)
                 .padding(12)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Theme.nocheHonda, in: RoundedRectangle(cornerRadius: 10))
+                .background(Theme.tarjeta, in: RoundedRectangle(cornerRadius: 10))
         }
     }
 }

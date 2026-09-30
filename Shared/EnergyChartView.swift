@@ -80,7 +80,7 @@ struct EnergyChartView: View {
                     y: .value("Energía", percent(now))
                 )
                 .symbolSize(compact ? 30 : 120)
-                .foregroundStyle(Color.white)
+                .foregroundStyle(Theme.puntoAhora)
             }
         }
         .chartXScale(domain: plan.start...plan.end)

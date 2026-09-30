@@ -16,7 +16,7 @@ struct HistoryView: View {
                     NightsChart(days: summary.last14, need: summary.need.hours)
                         .frame(height: 190)
                         .padding(.vertical, 8)
-                        .listRowBackground(Theme.noche)
+                        .listRowBackground(Theme.tarjeta)
                 } footer: {
                     Text("Últimas 14 noches contra tu necesidad de \(Fmt.hm(summary.need.hours)). Deuda actual: \(Fmt.debt(summary.debt)).")
                 }
@@ -25,7 +25,7 @@ struct HistoryView: View {
                     if sessions.isEmpty {
                         Text("Sin registros todavía. Toca + para agregar tu última noche.")
                             .foregroundStyle(Theme.tintaSuave)
-                            .listRowBackground(Theme.noche)
+                            .listRowBackground(Theme.tarjeta)
                     }
                     ForEach(sessions) { session in
                         Button {
@@ -33,7 +33,7 @@ struct HistoryView: View {
                         } label: {
                             SessionRow(session: session)
                         }
-                        .listRowBackground(Theme.noche)
+                        .listRowBackground(Theme.tarjeta)
                     }
                     .onDelete { offsets in
                         model.delete(ids: offsets.map { sessions[$0].id })
@@ -43,7 +43,7 @@ struct HistoryView: View {
                 }
             }
             .scrollContentBackground(.hidden)
-            .background(Theme.nocheHonda.ignoresSafeArea())
+            .background(Theme.fondo.ignoresSafeArea())
             .navigationTitle("Historial")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {

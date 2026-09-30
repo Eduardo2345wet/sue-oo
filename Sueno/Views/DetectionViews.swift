@@ -37,7 +37,7 @@ struct DetectionCard: View {
                 Button("Guardar") { model.acceptProposal(proposal) }
                     .buttonStyle(.borderedProminent)
                     .tint(Theme.melatonina)
-                    .foregroundStyle(Theme.nocheHonda)
+                    .foregroundStyle(Theme.sobreColor)
                 Button("Editar") { editing = proposal }
                     .buttonStyle(.bordered)
                     .tint(Theme.tinta)
@@ -191,7 +191,7 @@ struct DetectionDiagnosticsView: View {
             }
         }
         .scrollContentBackground(.hidden)
-        .background(Theme.nocheHonda.ignoresSafeArea())
+        .background(Theme.fondo.ignoresSafeArea())
         .navigationTitle("Detección de sueño")
         .navigationBarTitleDisplayMode(.inline)
         .confirmationDialog("¿Reiniciar el ajuste aprendido?", isPresented: $confirmReset, titleVisibility: .visible) {

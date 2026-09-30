@@ -28,7 +28,7 @@ struct TodayView: View {
                 .padding(.top, 24)
                 .padding(.bottom, 48)
             }
-            .background(Theme.nocheHonda.ignoresSafeArea())
+            .background(Theme.fondo.ignoresSafeArea())
         }
     }
 }
@@ -242,7 +242,7 @@ struct SleepButton: View {
             }
             .buttonStyle(.borderedProminent)
             .tint(summary.isAsleep ? Theme.ambar : Theme.melatonina)
-            .foregroundStyle(Theme.nocheHonda)
+            .foregroundStyle(Theme.sobreColor)
 
             if let message {
                 Text(message)
