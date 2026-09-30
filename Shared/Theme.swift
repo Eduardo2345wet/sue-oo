@@ -66,12 +66,10 @@ extension Color {
 /// el widget se queda con la paleta de noche porque WidgetKit lo dibuja por adelantado).
 /// Ámbar para la energía, azul marea para los bajones y morado para la melatonina.
 enum Theme {
-    /// La app lo prende al arrancar para que la paleta siga al reloj.
-    static var followsClock = false
+    /// Paleta actual. La cambia RootView cuando pasa de amanecer a día, etc.; el widget no la toca.
+    static var skyKind: SkyPalette.Kind = .noche
 
-    static var sky: SkyPalette {
-        followsClock ? SkyPalette.palette(SkyPalette.kind(at: Date())) : SkyPalette.noche
-    }
+    static var sky: SkyPalette { SkyPalette.palette(skyKind) }
 
     static var fondo: Color { sky.fondo }
     static var tarjeta: Color { sky.tarjeta }
