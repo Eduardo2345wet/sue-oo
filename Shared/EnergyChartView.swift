@@ -64,6 +64,7 @@ struct EnergyChartView: View {
         }
         .chartXScale(domain: plan.start...plan.end)
         .chartYScale(domain: yLow...yHigh)
+        .chartPlotStyle { plot in plot.clipped() }
         .chartYAxis(.hidden)
         .chartXAxis {
             AxisMarks(values: .stride(by: .hour, count: compact ? 4 : 3)) { _ in
