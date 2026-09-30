@@ -37,16 +37,22 @@ struct PhaseHeader: View {
     let summary: SleepSummary
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("HOY")
-                .font(.system(size: 14, weight: .medium))
-                .tracking(1.1)
-                .foregroundStyle(Theme.tintaSuave)
-            Text(summary.headline)
-                .font(Theme.display(44))
-                .foregroundStyle(summary.headlineColor)
-                .lineLimit(2)
-                .minimumScaleFactor(0.6)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .center, spacing: 16) {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("HOY")
+                        .font(.system(size: 14, weight: .medium))
+                        .tracking(1.1)
+                        .foregroundStyle(Theme.tintaSuave)
+                    Text(summary.headline)
+                        .font(Theme.display(40))
+                        .foregroundStyle(summary.headlineColor)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.6)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                PixelClock(date: summary.now)
+            }
             if !detail.isEmpty {
                 Text(detail)
                     .font(.system(size: 16))
@@ -65,7 +71,7 @@ struct PhaseHeader: View {
         }
         let phase = summary.phase
         if let until = phase.until {
-            let lead = Fmt.sentence("Dura hasta las \(Fmt.time(until))")
+            let lead = Fmt.sentence("\(phase.kind == .melatonina ? "Hasta" : "Dura hasta") las \(Fmt.time(until))")
             return phase.detail.isEmpty ? lead : lead + " " + phase.detail
         }
         return phase.detail
@@ -89,7 +95,7 @@ struct EnergyCard: View {
             }
             .padding(.horizontal, 2)
             EnergyChartView(plan: summary.plan, now: now)
-                .frame(height: 170)
+                .frame(height: 160)
         }
         .card()
     }

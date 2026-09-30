@@ -38,12 +38,12 @@ enum WindowKind: String, CaseIterable {
 
     var hint: String {
         switch self {
-        case .modorra: return "Tu cuerpo sigue saliendo del sueño. Luz de día y nada pesado."
-        case .picoManana: return "Buen momento para lo que exige concentración."
-        case .bajon: return "Energía baja: tareas fáciles, caminar o una siesta corta."
-        case .picoTarde: return "Segundo buen momento del día para estudiar o entrenar."
-        case .relajacion: return "Baja luces y pantallas; deja lo pesado para mañana."
-        case .melatonina: return "El mejor momento para dormirte."
+        case .modorra: return "Sal a la luz del sol y muévete para despertar."
+        case .picoManana: return "Aprovecha para lo que requiere más concentración."
+        case .bajon: return "Buen momento para tareas ligeras o una siesta corta."
+        case .picoTarde: return "Segundo impulso del día: ejercicio o trabajo pendiente."
+        case .relajacion: return "Baja las luces y deja las pantallas para prepararte a dormir."
+        case .melatonina: return "Es el mejor momento para irte a dormir."
         }
     }
 }

@@ -12,6 +12,10 @@ enum Theme {
     static let melatonina = Color(red: 157 / 255, green: 123 / 255, blue: 232 / 255)  // #9D7BE8
     static let alerta = Color(red: 239 / 255, green: 109 / 255, blue: 104 / 255)      // #EF6D68
     static let lavanda = Color(red: 185 / 255, green: 156 / 255, blue: 240 / 255)     // #B99CF0
+    // Degradado de la curva: verde arriba, amarillo en medio, rojo abajo.
+    static let energiaAlta = Color(red: 76 / 255, green: 211 / 255, blue: 138 / 255)   // #4CD38A
+    static let energiaMedia = Color(red: 242 / 255, green: 201 / 255, blue: 76 / 255)  // #F2C94C
+    static let energiaBaja = Color(red: 239 / 255, green: 91 / 255, blue: 91 / 255)    // #EF5B5B
     static let bien = Color(red: 122 / 255, green: 200 / 255, blue: 150 / 255)        // #7AC896
 
     /// Números y títulos en serif (New York): se lee tranquilo, como para la noche.
