@@ -46,12 +46,12 @@ struct PhaseHeader: View {
 
     var detail: String {
         if summary.isAsleep {
-            let since = summary.pendingSleepStart.map { "Desde las \(Fmt.time($0)). " } ?? ""
+            let since = summary.pendingSleepStart.map { "Desde las \(Fmt.time($0))\n" } ?? ""
             return since + "Cuando despiertes, toca «Ya me desperté»."
         }
         let phase = summary.phase
         if let until = phase.until {
-            return "Hasta las \(Fmt.time(until)). \(phase.detail)"
+            return "Hasta las \(Fmt.time(until))\n\(phase.detail)"
         }
         return phase.detail
     }
