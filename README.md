@@ -66,8 +66,9 @@ SideStore renueva sola en segundo plano mientras LocalDevVPN esté conectado. Si
 
 ## 6. Registrar tu sueño
 
-Tienes tres formas; usa la que te acomode:
+Tienes cuatro formas; usa la que te acomode:
 
+- **Detección automática**: al abrir la app, Sueño revisa el movimiento y los pasos del iPhone de las últimas 36 h y, si encuentra una noche sin registrar, te la propone en la pestaña Hoy. Tú decides si guardarla, editarla o descartarla. La primera vez pide permiso de **Movimiento y forma física**; no usa Salud.
 - **Botones** en la pestaña Hoy: «Me voy a dormir» y «Ya me desperté».
 - **A mano** en Historial con el botón +.
 - **Desde la app Salud** con un Atajo (abajo). Es lo más automático si Salud ya tiene tu sueño (reloj, app de sueño u horario de sueño del iPhone).
@@ -111,6 +112,7 @@ Cambias el código, lo subes a GitHub, descargas el nuevo `Sueno.ipa` y lo insta
 - **Falla la compilación en GitHub:** copia las líneas con `error:` y pásaselas a Claude.
 - **El widget dice «Abre Sueño»:** revisa Ajustes → Diagnóstico. Si dice «No», reinstala con SideStore conservando las extensiones. La app funciona igual aunque el widget no tenga datos.
 - **No llegan los avisos:** Ajustes del iPhone → Notificaciones → Sueño.
+- **No sale la noche detectada:** revisa Ajustes → Diagnóstico → Detección de sueño. Ahí ves si hay permiso, qué vio el sensor en las últimas 36 h y puedes correr las pruebas del detector.
 
 ## Cómo se calcula
 

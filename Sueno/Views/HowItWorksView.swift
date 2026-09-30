@@ -39,6 +39,11 @@ struct HowItWorksView: View {
                     text: "Tu energía potencial ajustada por el punto de la curva en el que vas: en tu pico es el 100 % de tu potencial y en lo más bajo, el 75 %.",
                     formula: "E_ahora = E_pot · (0.75 + 0.25 · nivel)"
                 )
+                Explainer(
+                    title: "Detección automática",
+                    text: "Al abrir la app lee las últimas 36 h de actividad y pasos del iPhone (sin Salud). Cada bin de 5 min recibe un score: moverte o caminar lo baja y las muestras largas y quietas lo suben. Luego se ajusta con tu horario habitual, que solo refuerza o castiga: nunca crea sueño por sí solo. Te propone el bloque más largo que parezca una noche y no lo guarda hasta que lo confirmas. Si editas las horas, desde 5 correcciones se aplica la mediana de lo que moviste.",
+                    formula: "moviéndote o ≥ 8 pasos: −1;  ≥ 3 pasos: −0.5\nmuestra ≥ 45 min: +1 · ≥ 30: +0.8 · ≥ 15: +0.35 · ≥ 6: −0.1 · menos: −0.6\n3+ muestras en el bin: −0.4;  quieto: +0.3 + 0.15·min(1, conf/2)\np = e^(−d²/32),  s' = s·(0.5 + 0.9p) − 0.25·(1 − p)\npromedio de 5 bins ≥ 0.35, huecos ≤ 25 min, orillas ≥ 0.65\nmínimo 3 h, promedio ≥ 0.5, la mitad entre 21:00 y 07:00"
+                )
                 Text("Es una aproximación con el modelo público SAFTE y reglas propias de esta app; no es el algoritmo de RISE ni un dispositivo médico.")
                     .font(.footnote)
                     .foregroundStyle(Theme.tintaSuave)

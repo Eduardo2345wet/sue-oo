@@ -8,6 +8,9 @@ struct TodayView: View {
             let summary = model.summary(at: context.date)
             ScrollView {
                 VStack(alignment: .leading, spacing: 28) {
+                    if let proposal = model.proposal {
+                        DetectionCard(proposal: proposal)
+                    }
                     PhaseHeader(summary: summary)
                     EnergyChartView(plan: summary.plan, now: context.date)
                         .frame(height: 210)

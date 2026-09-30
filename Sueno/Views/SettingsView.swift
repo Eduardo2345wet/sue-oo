@@ -76,6 +76,9 @@ struct SettingsView: View {
                             .font(.caption2)
                             .foregroundStyle(Theme.tintaSuave)
                     }
+                    NavigationLink(destination: DetectionDiagnosticsView()) {
+                        LabeledContent("Detección de sueño", value: detectionSummary)
+                    }
                 } header: {
                     Text("Diagnóstico")
                 } footer: {
@@ -151,6 +154,15 @@ struct SettingsView: View {
                 }
             }
         )
+    }
+
+    /// El ajuste aprendido de la detección, en corto.
+    var detectionSummary: String {
+        let a = SleepDetector.adjustment(from: model.data.detection.corrections)
+        if a.isActive {
+            return "\(Fmt.signedMinutes(a.startMinutes)) / \(Fmt.signedMinutes(a.endMinutes))"
+        }
+        return "Sin ajuste (\(a.corrections) de \(SleepDetector.minCorrections))"
     }
 
     func needFooter(_ need: NeedInfo) -> String {

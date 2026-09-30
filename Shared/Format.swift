@@ -26,6 +26,14 @@ enum Fmt {
         String(format: "%.1f h", max(0, hours))
     }
 
+    /// "+12 min", "−8 min" o "0 min"
+    static func signedMinutes(_ minutes: Double) -> String {
+        let m = Int(minutes.rounded())
+        if m > 0 { return "+\(m) min" }
+        if m < 0 { return "−\(-m) min" }
+        return "0 min"
+    }
+
     /// "77 %"
     static func percent(_ value: Double) -> String {
         "\(Int(value.rounded())) %"
