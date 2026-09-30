@@ -202,8 +202,18 @@ enum SleepDetector {
     }
 
     static func scores(_ input: MotionInput, midSleepHour: Double, calendar: Calendar) -> [Double] {
-        (0..<max(0, input.binCount)).map { i in
-            binScore(samples: input.samples,
+        let count = max(0, input.binCount)
+        // Reparte las muestras en los bins que tocan, en una sola pasada: con miles de muestras
+        // reales, revisarlas todas en cada bin se vuelve lento.
+        var byBin = [[Int]](repeating: [], count: count)
+        for (k, s) in input.samples.enumerated() {
+            let first = max(0, Int((s.start.timeIntervalSince(input.start) / binSeconds).rounded(.down)))
+            let last = min(count - 1, Int((s.end.timeIntervalSince(input.start) / binSeconds).rounded(.up)) - 1)
+            guard first <= last else { continue }
+            for i in first...last { byBin[i].append(k) }
+        }
+        return (0..<count).map { i in
+            binScore(samples: byBin[i].map { input.samples[$0] },
                      steps: i < input.steps.count ? input.steps[i] : 0,
                      binStart: binStart(input.start, i),
                      midSleepHour: midSleepHour,
