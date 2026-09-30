@@ -1,9 +1,14 @@
-name: Compilar IPA
+name: Compilar IPA y Publicar Fuente
 
 on:
   workflow_dispatch:
   push:
     branches: [ main ]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
   compilar:
@@ -13,6 +18,8 @@ jobs:
     steps:
       - name: Descargar el código
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Versión de Xcode
         run: xcodebuild -version
@@ -20,10 +27,79 @@ jobs:
       - name: Instalar XcodeGen
         run: brew install xcodegen
 
+      - name: Configurar número de corrida de GitHub como buildVersion
+        run: |
+          sed -i '' "s/CURRENT_PROJECT_VERSION: .*/CURRENT_PROJECT_VERSION: \"${{ github.run_number }}\"/" project.yml
+
       - name: Generar el proyecto de Xcode
         run: xcodegen generate
 
-      - name: Compilar sin firmar
+      - name: Correr pruebas de SleepDetectorTests
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project Sueno.xcodeproj \
+            -scheme SleepDetectorTestsRunner \
+            -configuration Release \
+            -derivedDataPath build_tests \
+            build
+          ./build_tests/Build/Products/Release/SleepDetectorTestsRunner
+
+      - name: Compilar para simulador y tomar capturas
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project Sueno.xcodeproj \
+            -scheme Sueno \
+            -configuration Debug \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -derivedDataPath build_sim \
+            -quiet \
+            build
+
+          SIM_APP="build_sim/Build/Products/Debug-iphonesimulator/Sueno.app"
+          DEVICE_UDID=$(xcrun simctl list devices iPhone | grep "iPhone 16 (" | head -n1 | sed -E 's/.*\(([A-F0-9-]+)\).*/\1/')
+          if [ -z "$DEVICE_UDID" ]; then
+            RUNTIME=$(xcrun simctl list runtimes | grep iOS | tail -n1 | awk '{print $NF}')
+            DEVICE_UDID=$(xcrun simctl create "iPhone 16" "com.apple.CoreSimulator.SimDeviceType.iPhone-16" "$RUNTIME")
+          fi
+          xcrun simctl boot "$DEVICE_UDID" || true
+          xcrun simctl status_bar "$DEVICE_UDID" override --time "09:41" --batteryState charged --batteryLevel 100
+          xcrun simctl install "$DEVICE_UDID" "$SIM_APP"
+
+          mkdir -p capturas
+
+          # Screen 1: Hoy
+          xcrun simctl launch "$DEVICE_UDID" com.eduardo.sueno -demoData 1 -screen 1
+          sleep 3
+          xcrun simctl io "$DEVICE_UDID" screenshot capturas/1_hoy.png
+          xcrun simctl terminate "$DEVICE_UDID" com.eduardo.sueno
+
+          # Screen 2: Historial
+          xcrun simctl launch "$DEVICE_UDID" com.eduardo.sueno -demoData 1 -screen 2
+          sleep 3
+          xcrun simctl io "$DEVICE_UDID" screenshot capturas/2_historial.png
+          xcrun simctl terminate "$DEVICE_UDID" com.eduardo.sueno
+
+          # Screen 3: Ajustes
+          xcrun simctl launch "$DEVICE_UDID" com.eduardo.sueno -demoData 1 -screen 3
+          sleep 3
+          xcrun simctl io "$DEVICE_UDID" screenshot capturas/3_ajustes.png
+          xcrun simctl terminate "$DEVICE_UDID" com.eduardo.sueno
+
+          # Screen 4: Cómo se calcula
+          xcrun simctl launch "$DEVICE_UDID" com.eduardo.sueno -demoData 1 -screen 4
+          sleep 3
+          xcrun simctl io "$DEVICE_UDID" screenshot capturas/4_comosecalcula.png
+          xcrun simctl terminate "$DEVICE_UDID" com.eduardo.sueno
+
+      - name: Subir capturas del simulador
+        uses: actions/upload-artifact@v4
+        with:
+          name: capturas
+          path: capturas/
+
+      - name: Compilar sin firmar para dispositivo
         run: |
           set -o pipefail
           xcodebuild \
@@ -56,6 +132,53 @@ jobs:
           name: Sueno-ipa
           path: Sueno.ipa
           retention-days: 30
+
+      - name: Publicar GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="1.0"
+          BUILD="${{ github.run_number }}"
+          TAG_NAME="v${VERSION}-${BUILD}"
+          COMMIT_MSG=$(git log -1 --format=%s)
+          gh release create "$TAG_NAME" Sueno.ipa --title "$TAG_NAME" --notes "$COMMIT_MSG" || gh release upload "$TAG_NAME" Sueno.ipa --clobber
+
+      - name: Generar y verificar apps.json para AltStore
+        run: |
+          VERSION="1.0"
+          BUILD="${{ github.run_number }}"
+          TAG_NAME="v${VERSION}-${BUILD}"
+          COMMIT_MSG=$(git log -1 --format=%s)
+          DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${TAG_NAME}/Sueno.ipa"
+          SIZE=$(stat -f%z Sueno.ipa)
+          APP_PLIST="build/Build/Products/Release-iphoneos/Sueno.app/Info.plist"
+
+          git fetch origin gh-pages:gh-pages || true
+          if git show gh-pages:apps.json >/dev/null 2>&1; then
+            git show gh-pages:apps.json > apps.json
+          fi
+
+          python3 scripts/update_apps_json.py \
+            --version "$VERSION" \
+            --build "$BUILD" \
+            --commit-msg "$COMMIT_MSG" \
+            --date "$DATE" \
+            --download-url "$DOWNLOAD_URL" \
+            --size "$SIZE" \
+            --app-plist "$APP_PLIST" \
+            --json-path "apps.json" \
+            --repo "${{ github.repository }}"
+
+          mkdir -p gh_pages_deploy
+          cp apps.json gh_pages_deploy/
+
+      - name: Publicar fuente AltStore en GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./gh_pages_deploy
+          publish_branch: gh-pages
 
       - name: Subir el log si falló
         if: failure()

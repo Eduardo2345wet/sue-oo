@@ -14,10 +14,47 @@ final class AppModel: ObservableObject {
 
     init() {
         data = SharedStore.load()
+        if CommandLine.arguments.contains("-demoData") {
+            data.sessions = AppModel.generateDemoSessions()
+        }
         // Si un Atajo cambia los datos mientras la app está abierta, se recargan.
         observer = NotificationCenter.default.addObserver(forName: .suenoDatosCambiaron, object: nil, queue: .main) { [weak self] _ in
             Task { @MainActor in self?.reload() }
         }
+    }
+
+    static func generateDemoSessions() -> [SleepSession] {
+        let cal = Calendar.current
+        let now = Date()
+        let today = cal.startOfDay(for: now)
+
+        let durations: [Double] = [7.5, 8.0, 6.5, 8.25, 7.0, 8.5, 6.75, 7.75, 8.0, 6.25, 8.5, 7.25, 8.0, 7.5]
+        let wakeOffsets: [Double] = [0.25, 0.5, -0.25, 0.75, 0.0, 0.5, -0.5, 0.25, 0.0, -0.25, 0.5, 0.0, 0.25, 0.0]
+
+        var sessions: [SleepSession] = []
+
+        for i in 1...14 {
+            let duration = durations[i - 1]
+            let wakeHourOffset = wakeOffsets[i - 1]
+
+            guard let targetDay = cal.date(byAdding: .day, value: -(i - 1), to: today),
+                  let wakeTime = cal.date(bySettingHour: 7, minute: 15, second: 0, of: targetDay)?.addingTimeInterval(wakeHourOffset * 3600) else {
+                continue
+            }
+
+            let startTime = wakeTime.addingTimeInterval(-duration * 3600)
+            let source: SleepSource = (i % 3 == 0) ? .movimiento : ((i % 2 == 0) ? .atajo : .manual)
+
+            sessions.append(SleepSession(
+                id: UUID(),
+                start: startTime,
+                end: wakeTime,
+                isNap: false,
+                source: source
+            ))
+        }
+
+        return sessions
     }
 
     func summary(at date: Date = Date()) -> SleepSummary {

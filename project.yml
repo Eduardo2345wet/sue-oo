@@ -51,3 +51,18 @@ targets:
         INFOPLIST_FILE: Config/SuenoWidget-Info.plist
         CODE_SIGN_ENTITLEMENTS: Config/SuenoWidget.entitlements
         SKIP_INSTALL: YES
+
+  SleepDetectorTestsRunner:
+    type: commandLine
+    platform: macOS
+    sources:
+      - path: TestsMain
+      - path: Sueno/SleepDetectorTests.swift
+      - path: Shared/Models.swift
+      - path: Shared/SleepDetector.swift
+      - path: Shared/SleepEngine.swift
+    settings:
+      base:
+        PRODUCT_NAME: SleepDetectorTestsRunner
+        MACOSX_DEPLOYMENT_TARGET: "14.0"
+    scheme: {}
