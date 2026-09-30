@@ -27,6 +27,7 @@ struct RootView: View {
                 .tabItem { Label("Ajustes", systemImage: "slider.horizontal.3") }
         }
         .tint(Theme.ambar)
+        .task { await model.detectSleep() }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
                 model.becameActive()

@@ -4,6 +4,12 @@ import WidgetKit
 @MainActor
 final class AppModel: ObservableObject {
     @Published private(set) var data: AppData
+    /// Noche detectada con el movimiento del iPhone, esperando que la confirmes.
+    @Published private(set) var proposal: SleepProposal? = nil
+    /// Último análisis del detector, para Diagnóstico.
+    @Published private(set) var detection: DetectionAnalysis? = nil
+    private var motionInput: MotionInput? = nil
+    private var readingMotion = false
     private var observer: NSObjectProtocol?
 
     init() {
@@ -20,12 +26,14 @@ final class AppModel: ObservableObject {
 
     func reload() {
         data = SharedStore.load()
+        refreshDetection()
     }
 
     func becameActive() {
         reload()
         Notifier.reschedule(for: data)
         WidgetCenter.shared.reloadAllTimelines()
+        Task { await detectSleep() }
     }
 
     /// Cambia los datos, guarda y refresca widget y avisos.
@@ -50,6 +58,53 @@ final class AppModel: ObservableObject {
         SharedStore.save(newData)
         WidgetCenter.shared.reloadAllTimelines()
         Notifier.reschedule(for: newData)
+        refreshDetection()
+    }
+
+    // MARK: Detección automática
+
+    /// Lee las últimas 36 h de movimiento y busca una noche sin registrar. Sin permiso o sin datos, no propone nada.
+    func detectSleep() async {
+        guard !readingMotion else { return }
+        readingMotion = true
+        motionInput = await MotionReader.read()
+        readingMotion = false
+        refreshDetection()
+    }
+
+    /// Vuelve a correr el detector con lo último que se leyó (rápido; no vuelve a leer los sensores).
+    private func refreshDetection() {
+        guard let input = motionInput else {
+            detection = nil
+            proposal = nil
+            return
+        }
+        let analysis = SleepDetector.analyze(input, midSleepHour: summary().timing.midSleepHour,
+                                             sessions: data.sessions, state: data.detection)
+        detection = analysis
+        proposal = data.pendingSleepStart == nil ? analysis.proposal : nil
+    }
+
+    /// Guarda la propuesta tal cual o con las horas que editaste (y aprende de la diferencia).
+    func acceptProposal(_ proposal: SleepProposal, start: Date? = nil, end: Date? = nil) {
+        let s = start ?? proposal.start
+        let e = end ?? proposal.end
+        guard e > s else { return }
+        update { (d: inout AppData) in
+            SleepDetector.recordCorrection(&d.detection, proposal: proposal, savedStart: s, savedEnd: e, at: Date())
+            let hours = e.timeIntervalSince(s) / 3600
+            d.sessions.append(SleepSession(start: s, end: e, isNap: hours < 3, source: .movimiento))
+        }
+    }
+
+    func dismissProposal(_ proposal: SleepProposal) {
+        update { (d: inout AppData) in
+            SleepDetector.recordDismissal(&d.detection, proposal: proposal, now: Date())
+        }
+    }
+
+    func resetDetectionAdjustment() {
+        update { (d: inout AppData) in d.detection.corrections = [] }
     }
 
     // MARK: Acciones
