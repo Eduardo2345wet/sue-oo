@@ -5,6 +5,7 @@ enum SleepSource: String, Codable {
     case manual
     case boton
     case atajo
+    case movimiento
 }
 
 /// Un bloque de sueño: una noche o una siesta.
@@ -36,11 +37,31 @@ struct AppSettings: Codable, Equatable {
     var notifyBedtime: Bool = true
 }
 
+/// Un rango que detectó el sensor de movimiento (sin el ajuste aprendido).
+struct DetectedRange: Codable, Equatable {
+    var start: Date
+    var end: Date
+}
+
+/// Cuánto moviste una propuesta antes de guardarla, contra lo que detectó el sensor.
+struct DetectionCorrection: Codable, Equatable {
+    var date: Date
+    var startMinutes: Double
+    var endMinutes: Double
+}
+
+/// Lo que la detección automática recuerda: propuestas descartadas y tus correcciones.
+struct DetectionState: Codable, Equatable {
+    var dismissed: [DetectedRange] = []
+    var corrections: [DetectionCorrection] = []
+}
+
 struct AppData: Codable, Equatable {
     var sessions: [SleepSession] = []
     var settings: AppSettings = AppSettings()
     /// Hora en que tocaste "Me voy a dormir" y todavía no "Ya me desperté".
     var pendingSleepStart: Date? = nil
+    var detection: DetectionState = DetectionState()
 }
 
 // Decodificación tolerante: si en el futuro se agregan campos, los respaldos viejos siguen sirviendo.
@@ -76,5 +97,14 @@ extension AppData {
         sessions = (try? c.decodeIfPresent([SleepSession].self, forKey: .sessions)) ?? []
         settings = (try? c.decodeIfPresent(AppSettings.self, forKey: .settings)) ?? AppSettings()
         pendingSleepStart = try? c.decodeIfPresent(Date.self, forKey: .pendingSleepStart)
+        detection = (try? c.decodeIfPresent(DetectionState.self, forKey: .detection)) ?? DetectionState()
+    }
+}
+
+extension DetectionState {
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        dismissed = (try? c.decodeIfPresent([DetectedRange].self, forKey: .dismissed)) ?? []
+        corrections = (try? c.decodeIfPresent([DetectionCorrection].self, forKey: .corrections)) ?? []
     }
 }

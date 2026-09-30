@@ -130,6 +130,7 @@ struct SessionRow: View {
         switch session.source {
         case .atajo: text += ", de Salud"
         case .boton: text += ", con el botón"
+        case .movimiento: text += ", detectado por movimiento"
         case .manual: break
         }
         return text
